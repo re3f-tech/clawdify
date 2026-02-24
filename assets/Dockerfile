@@ -1,10 +1,10 @@
-FROM node:lts-alpine AS builder
+FROM node:20-slim AS builder
 
 ARG COMMIT=bd86e1f
 
 WORKDIR /app
 
-RUN apk add --no-cache git sed
+RUN apt-get update && apt-get install -y git sed && rm -rf /var/lib/apt/lists/*
 
 RUN git clone --recurse-submodules https://github.com/billsonnn/nitro-converter.git .
 RUN git switch -c habbo-room-content $COMMIT
