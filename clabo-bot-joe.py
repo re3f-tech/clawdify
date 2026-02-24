@@ -5,6 +5,7 @@ Patrols the bar, checks the DJ booth, waves at people, shouts hype lines.
 """
 
 import asyncio
+import os
 import random
 import struct
 import subprocess
@@ -13,6 +14,9 @@ import websockets
 
 # Config
 WS_URL = "ws://127.0.0.1:2096"
+DB_USER = os.environ.get("MYSQL_USER", "arcturus_user")
+DB_PASS = os.environ.get("MYSQL_PASSWORD", "arcturus_pw")
+DB_NAME = os.environ.get("MYSQL_DATABASE", "arcturus")
 ROOM_ID = 206
 USER_ID = 4  # joejoegopro
 
@@ -137,8 +141,8 @@ async def drain(ws, timeout=2):
 async def run_bot():
     # Get fresh SSO ticket
     result = subprocess.run(
-        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", "arcturus_user",
-         "-parcturus_pw", "arcturus", "-N", "-e",
+        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", DB_USER,
+         f"-p{DB_PASS}", DB_NAME, "-N", "-e",
          f"SELECT auth_ticket FROM users WHERE id={USER_ID};"],
         capture_output=True, text=True
     )

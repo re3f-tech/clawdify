@@ -25,9 +25,13 @@ BOT_USER_ID = 8
 BOT_USERNAME = "claude"
 LOCK_FILE = "/tmp/clabo-bot-claude.lock"
 
-OPENROUTER_KEY = "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"
-OPENROUTER_MODEL = "openai/gpt-4o-mini"
+OPENROUTER_KEY = os.environ.get("OPENROUTER_KEY", "")
+OPENROUTER_MODEL = os.environ.get("OPENROUTER_MODEL", "openai/gpt-4o-mini")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+
+DB_USER = os.environ.get("MYSQL_USER", "arcturus_user")
+DB_PASS = os.environ.get("MYSQL_PASSWORD", "arcturus_pw")
+DB_NAME = os.environ.get("MYSQL_DATABASE", "arcturus")
 
 # ── Outgoing packet headers ──────────────────────────────────────────
 SECURITY_TICKET = 2419
@@ -304,8 +308,8 @@ async def run_bot():
     # ── Auth ──────────────────────────────────────────────────────────
     sso_ticket = f"ClaboBot-claude-{int(time.time())}"
     subprocess.run(
-        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", "arcturus_user",
-         "-parcturus_pw", "arcturus", "-N", "-e",
+        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", DB_USER,
+         f"-p{DB_PASS}", DB_NAME, "-N", "-e",
          f"UPDATE users SET auth_ticket='{sso_ticket}' WHERE id={BOT_USER_ID};"],
         capture_output=True,
     )

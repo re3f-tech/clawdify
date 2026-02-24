@@ -6,6 +6,7 @@ to upgrade the CLABO NIGHTCLUB. Stops after 5 minutes.
 """
 
 import asyncio
+import os
 import struct
 import subprocess
 import sys
@@ -13,6 +14,9 @@ import time
 import websockets
 
 WS_URL = "ws://127.0.0.1:2096"
+DB_USER = os.environ.get("MYSQL_USER", "arcturus_user")
+DB_PASS = os.environ.get("MYSQL_PASSWORD", "arcturus_pw")
+DB_NAME = os.environ.get("MYSQL_DATABASE", "arcturus")
 ROOM_ID = 206
 USER_ID = 5
 DURATION = 300  # 5 minutes
@@ -194,14 +198,14 @@ async def run_bot():
 
     # Refresh SSO
     subprocess.run(
-        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", "arcturus_user",
-         "-parcturus_pw", "arcturus", "-N", "-e",
+        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", DB_USER,
+         f"-p{DB_PASS}", DB_NAME, "-N", "-e",
          f"UPDATE users SET auth_ticket='ClaboBot-dude-build-{int(time.time())}' WHERE id={USER_ID};"],
         capture_output=True
     )
     result = subprocess.run(
-        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", "arcturus_user",
-         "-parcturus_pw", "arcturus", "-N", "-e",
+        ["docker", "exec", "clabo-hotel-db-1", "mysql", "-u", DB_USER,
+         f"-p{DB_PASS}", DB_NAME, "-N", "-e",
          f"SELECT auth_ticket FROM users WHERE id={USER_ID};"],
         capture_output=True, text=True
     )
